@@ -6,8 +6,8 @@ data class Topic(
         @SerializedName("id") val id: String,
         @SerializedName("name") val name: String,
         @SerializedName("position") val position: Int,
-        @SerializedName("mcq") val mcq: Int,
-        @SerializedName("mcq") val mq: Int,
-        @SerializedName("mcq") val wq: Int,
-        @SerializedName("mcq") val fbq: Int
+        @SerializedName("mcq") val mcq: List<MultipleChoiceQuestion>,
+        @SerializedName("mq") val mq: List<MatchingQuestion>,
+        @SerializedName("wq") val wq: List<WordQuestion>,
+        @SerializedName("fbq") val fbq: List<FillBlankQuestion>
 )

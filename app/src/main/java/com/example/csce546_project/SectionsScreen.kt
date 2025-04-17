@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.csce546_project.models.Section
 import com.example.csce546_project.network.RetrofitInstance
 import com.example.csce546_project.network.TokenManager
@@ -36,7 +37,7 @@ private const val PASSWORD = "pass"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SectionsScreen() {
+fun SectionsScreen(navigateTo: (String) -> Unit) {
     val sections = remember { mutableStateOf<List<Section>>(emptyList()) }
     val isLoading = remember { mutableStateOf(true) }
     val error = remember { mutableStateOf<String?>(null) }
@@ -101,7 +102,7 @@ fun SectionsScreen() {
                     )
                 }
                 else -> {
-                    SectionList(sections = sections.value)
+                    SectionList(sections = sections.value, navigateTo = navigateTo)
                 }
             }
         }
@@ -109,23 +110,23 @@ fun SectionsScreen() {
 }
 
 @Composable
-fun SectionList(sections: List<Section>) {
+fun SectionList(sections: List<Section>, navigateTo: (String) -> Unit) {
     LazyColumn(modifier = Modifier.padding(8.dp)) {
         items(sections) { section ->
-            SectionCard(section = section)
+            SectionCard(section = section, navigateTo = navigateTo)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SectionCard(section: Section) {
+fun SectionCard(section: Section, navigateTo: (String) -> Unit) {
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxSize(),
         onClick = {
-            Log.d("SectionCard", "Clicked on section: ${section.name}")
+            navigateTo(section.id)
         }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -135,13 +136,5 @@ fun SectionCard(section: Section) {
                 fontWeight = FontWeight.Bold
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SectionsScreenPreview() {
-    CSCE546ProjectTheme {
-        SectionsScreen()
     }
 }

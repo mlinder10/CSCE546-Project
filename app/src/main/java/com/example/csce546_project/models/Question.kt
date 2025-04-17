@@ -26,7 +26,7 @@ data class MatchingQuestion(
         @SerializedName("title") override val title: String,
         @SerializedName("hint") override val hint: String,
         @SerializedName("topicId") override val topicId: String,
-        @SerializedName("relations") val relations: List<Pair<String, String>>,
+        @SerializedName("relations") val relations: List<List<String>>, // Pair was throwing an error, switched to a List instead
         @SerializedName("type") val type: String = "matching"
 ) : Question
 
