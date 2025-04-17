@@ -42,7 +42,7 @@ android {
 dependencies {
 
     // Retrofit for making network requests
-    implementation("m.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
     // Gson converter for Retrofit
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     // Kotlin Coroutine Support for Retrofit

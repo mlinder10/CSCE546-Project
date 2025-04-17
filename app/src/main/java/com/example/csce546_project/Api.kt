@@ -2,13 +2,31 @@ package com.example.csce546_project.network
 
 import com.example.csce546_project.models.*
 import com.google.gson.annotations.SerializedName
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
 val IS_DEBUG = false
 
+// Store authentication token
+object TokenManager {
+    var token: String? = null
+}
+
 data class AuthResponse(@SerializedName("token") val token: String)
+
+// Authentication interceptor to add token to requests
+class AuthInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain) = chain.proceed(
+        chain.request().newBuilder().apply {
+            TokenManager.token?.let { token ->
+                addHeader("Authorization", "Bearer $token")
+            }
+        }.build()
+    )
+}
 
 interface ApiService {
     @POST("auth/student/login")
@@ -66,11 +84,16 @@ interface ApiService {
 }
 
 object RetrofitInstance {
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(AuthInterceptor())
+        .build()
+
     private val retrofit = Retrofit.Builder()
         .baseUrl(
             if (IS_DEBUG) "http://127.0.0.1:3000/api/"
             else "https://capstone-server-blush.vercel.app/api/"
         )
+        .client(client)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
