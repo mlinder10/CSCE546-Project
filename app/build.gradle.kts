@@ -51,6 +51,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
     // Gson for object serialization/deserialization (if not using a converter)
     implementation("com.google.code.gson:gson:2.8.8")
+    // Adds more icons
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
