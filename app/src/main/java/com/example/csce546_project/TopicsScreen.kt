@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -76,11 +77,15 @@ fun TopicCard(
         onClick = { expanded.value = !expanded.value }
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text(
-                text = topic.name,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = topic.name,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(Icons.Default.ExpandMore, modifier = Modifier.rotate(if (expanded.value) 0f else -90f), contentDescription = "Expand")
+            }
 
             AnimatedVisibility(visible = expanded.value) {
                 Column(Modifier.padding(top = 8.dp)) {
