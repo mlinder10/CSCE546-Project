@@ -16,13 +16,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.csce546_project.models.Course
 import com.example.csce546_project.models.Topic
 import com.example.csce546_project.network.RetrofitInstance
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopicsScreen(sectionId: String, onBack: () -> Unit) {
+fun TopicsScreen(sectionId: String, onBack: () -> Unit, navController: NavController) {
     val topics = remember { mutableStateOf<List<Topic>>(emptyList()) }
     val course = remember { mutableStateOf<Course?>(null) }
     val isLoading = remember { mutableStateOf(true) }
@@ -55,7 +56,9 @@ fun TopicsScreen(sectionId: String, onBack: () -> Unit) {
         } else {
             LazyColumn(Modifier.padding(padding)) {
                 items(topics.value) { topic ->
-                    TopicCard(topic)
+                    TopicCard(topic) { selectedTopic, type ->
+                        navController.navigate("question/${selectedTopic}/${type}")
+                    }
                 }
             }
         }
@@ -65,9 +68,16 @@ fun TopicsScreen(sectionId: String, onBack: () -> Unit) {
 @Composable
 fun TopicCard(
     topic: Topic,
-    onQuestionTypeSelected: (topic: Topic, type: String) -> Unit = { _, _ -> }
+    onQuestionTypeSelected: (topic: String, type: String) -> Unit = { _, _ -> }
 ) {
-    val questionTypes = listOf("Multiple Choice", "Matching", "Word", "Fill in Blank")
+    data class QuestionType(val label: String, val apiValue: String)
+    val questionTypes = listOf(
+        QuestionType("Multiple Choice", "multiple-choice"),
+        QuestionType("Matching", "matching"),
+        QuestionType("Word", "word"),
+        QuestionType("Fill in Blank", "fill-blank")
+    )
+
     val expanded = remember { mutableStateOf(false) }
 
     Card(
@@ -101,7 +111,7 @@ fun TopicCard(
                                     .padding(4.dp)
                             ) {
                                 Button(
-                                    onClick = { onQuestionTypeSelected(topic, type) },
+                                    onClick = { onQuestionTypeSelected(topic.id, type.apiValue) },
                                     modifier = Modifier.fillMaxSize(),
                                     shape = MaterialTheme.shapes.medium,
                                     contentPadding = PaddingValues(4.dp)
@@ -112,13 +122,13 @@ fun TopicCard(
                                         modifier = Modifier.fillMaxSize()
                                     ) {
                                         Icon(
-                                            imageVector = getIcon(type),
+                                            imageVector = getIcon(type.label),
                                             contentDescription = null,
                                             modifier = Modifier.size(20.dp)
                                         )
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
-                                            text = type,
+                                            text = type.label,
                                             maxLines = 2,
                                             softWrap = true,
                                             textAlign = TextAlign.Center,
@@ -136,7 +146,7 @@ fun TopicCard(
 }
 
 @Composable
-fun getIcon(type: String) = when (type) {
+fun getIcon(label: String) = when (label) {
     "Multiple Choice" -> Icons.Default.Help
     "Matching" -> Icons.Default.Shuffle
     "Word" -> Icons.Default.Edit

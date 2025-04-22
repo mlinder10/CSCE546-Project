@@ -50,7 +50,7 @@ dependencies {
     // (Optional) Logging Interceptor for Retrofit (for debugging)
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
     // Gson for object serialization/deserialization (if not using a converter)
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation("com.google.code.gson:gson:2.10.1")
     // Adds more icons
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
 

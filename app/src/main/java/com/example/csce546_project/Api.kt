@@ -1,6 +1,9 @@
 package com.example.csce546_project.network
 
 import com.example.csce546_project.models.*
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapterFactory
 import com.google.gson.annotations.SerializedName
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -65,11 +68,31 @@ interface ApiService {
         @Body enrollmentCode: Map<String, String>
     )
 
-    @GET("question/{topicId}/{type}")
-    suspend fun fetchQuestions(
+    /*
+        Retrofit is really annoying and won't let me use generic types,
+        it makes you declare the type you want to fetch at compile time
+        so I split the api calls for each type.
+        This is kind of ugly but its the easiest way to do it
+     */
+    @GET("question/{topicId}/multiple-choice")
+    suspend fun fetchMCQuestions(
         @Path("topicId") topicId: String,
-        @Path("type") type: String
-    ): List<Question>
+    ): List<MultipleChoiceQuestion>
+
+    @GET("question/{topicId}/matching")
+    suspend fun fetchMatchingQuestions(
+        @Path("topicId") topicId: String,
+    ): List<MatchingQuestion>
+
+    @GET("question/{topicId}/fill-blank")
+    suspend fun fetchFillBlankQuestions(
+        @Path("topicId") topicId: String,
+    ): List<FillBlankQuestion>
+
+    @GET("question/{topicId}/word")
+    suspend fun fetchWordQuestions(
+        @Path("topicId") topicId: String,
+    ): List<WordQuestion>
 
     @GET("leaderboard/{sectionId}")
     suspend fun fetchLeaderboard(
@@ -82,6 +105,7 @@ interface ApiService {
     @POST("leaderboard/update")
     suspend fun updateLeaderboard()
 }
+
 
 object RetrofitInstance {
     private val client = OkHttpClient.Builder()
