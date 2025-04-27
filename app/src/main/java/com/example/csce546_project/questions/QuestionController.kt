@@ -30,6 +30,7 @@ import com.example.csce546_project.models.Question
 import com.example.csce546_project.network.RetrofitInstance
 import androidx.compose.material3.AlertDialog
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionScreen(
@@ -42,6 +43,7 @@ fun QuestionScreen(
     val isLoading = remember { mutableStateOf(true) }
     var numCorrect by remember { mutableStateOf(0) }
     var showResults by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(topicId, type) {
         questions.clear()
@@ -90,6 +92,7 @@ fun QuestionScreen(
                     if (questions.isNotEmpty())
                          Text("Question " + (index + 1) + "/" + questions.size)
                 },
+
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -157,6 +160,3 @@ fun NumCorrectAlert(
         text = { Text("$numCorrect/$total correct") },
     )
 }
-
-
-
