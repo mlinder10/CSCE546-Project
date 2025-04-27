@@ -28,7 +28,7 @@ import com.example.csce546_project.TopicCard
 import com.example.csce546_project.models.*
 import com.example.csce546_project.models.Question
 import com.example.csce546_project.network.RetrofitInstance
-
+import androidx.compose.material3.AlertDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +40,8 @@ fun QuestionScreen(
     var index by remember { mutableStateOf(0) }
     val questions = remember { mutableStateListOf<Question>()}
     val isLoading = remember { mutableStateOf(true) }
+    var numCorrect by remember { mutableStateOf(0) }
+    var showResults by remember { mutableStateOf(false) }
 
     LaunchedEffect(topicId, type) {
         questions.clear()
@@ -70,18 +72,24 @@ fun QuestionScreen(
         }
     }
 
-    fun onSubmit() {
+    fun onSubmit(isCorrect: Boolean) {
+        if (isCorrect) {
+            numCorrect++
+        }
         if (index + 1 < questions.size) {
             index++
         } else {
-            onBack()
+           showResults = true
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Questions") },
+                title = {
+                    if (questions.isNotEmpty())
+                         Text("Question " + (index + 1) + "/" + questions.size)
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -102,13 +110,20 @@ fun QuestionScreen(
 
                 else -> {
                     when (val question = questions[index]) {
-                        is MultipleChoiceQuestion -> MultipleChoiceScreen(question, ::onSubmit)
-                        is FillBlankQuestion -> FillBlankScreen(question, ::onSubmit)
-                        is MatchingQuestion -> MatchingScreen(question, ::onSubmit)
-                        is WordQuestion -> WordScreen(question, ::onSubmit)
+                        is MultipleChoiceQuestion -> MultipleChoiceScreen(question, onSubmit = { isCorrect -> onSubmit(isCorrect) })
+                        is FillBlankQuestion -> FillBlankScreen(question, onSubmit = { isCorrect -> onSubmit(isCorrect) })
+                        is MatchingQuestion -> MatchingScreen(question, onSubmit = { isCorrect -> onSubmit(isCorrect) })
+                        is WordQuestion -> WordScreen(question, onSubmit = { isCorrect -> onSubmit(isCorrect) })
                     }
                 }
             }
+        }
+        if (showResults) {
+            NumCorrectAlert(
+                numCorrect,
+                questions.size,
+                onDismiss = { showResults = false; onBack() }
+            )
         }
     }
 }
@@ -127,4 +142,21 @@ fun NotFoundScreen(onBack: () -> Unit) {
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NumCorrectAlert(
+    numCorrect: Int,
+    total: Int,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = { Button(onClick = onDismiss) { Text("OK") } },
+        title = { Text("Quiz Completed") },
+        text = { Text("$numCorrect/$total correct") },
+    )
+}
+
+
 
