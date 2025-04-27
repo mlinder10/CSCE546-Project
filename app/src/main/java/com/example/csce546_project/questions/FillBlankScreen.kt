@@ -11,11 +11,11 @@ import com.example.csce546_project.models.FillBlankQuestion
 import androidx.compose.ui.Modifier
 
 @Composable
-fun FillBlankScreen(question : FillBlankQuestion, onSubmit: () -> Unit) {
+fun FillBlankScreen(question : FillBlankQuestion, onSubmit: (Boolean) -> Unit) {
     Column {
         Text("Fill Blank Screen")
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onSubmit) {
+        Button(onClick = {onSubmit(true)}) {
             Text("Submit")
         }
     }

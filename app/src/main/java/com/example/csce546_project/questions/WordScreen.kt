@@ -11,11 +11,11 @@ import com.example.csce546_project.models.WordQuestion
 import androidx.compose.ui.Modifier
 
 @Composable
-fun WordScreen(question : WordQuestion, onSubmit: () -> Unit) {
+fun WordScreen(question : WordQuestion, onSubmit: (Boolean) -> Unit) {
     Column {
         Text("Word Screen")
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onSubmit) {
+        Button(onClick = {onSubmit(true)}) {
             Text("Submit")
         }
     }

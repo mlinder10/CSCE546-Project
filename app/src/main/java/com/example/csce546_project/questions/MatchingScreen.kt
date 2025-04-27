@@ -11,11 +11,11 @@ import com.example.csce546_project.models.MatchingQuestion
 import androidx.compose.ui.Modifier
 
 @Composable
-fun MatchingScreen(question : MatchingQuestion, onSubmit: () -> Unit) {
+fun MatchingScreen(question : MatchingQuestion, onSubmit: (Boolean) -> Unit) {
     Column {
         Text("Matching Screen")
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onSubmit) {
+        Button(onClick = {onSubmit(true)}) {
             Text("Submit")
         }
     }
