@@ -135,7 +135,7 @@ fun NotFoundScreen(onBack: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Questions not found")
+        Text("No Questions Found")
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onBack) {
             Text("Go Back")
