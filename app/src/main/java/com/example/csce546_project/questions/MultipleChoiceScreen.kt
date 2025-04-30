@@ -1,7 +1,6 @@
 package com.example.csce546_project.questions
 
 import android.graphics.BitmapFactory
-import android.widget.ImageView
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
