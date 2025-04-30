@@ -22,7 +22,7 @@ fun WordScreen(
     var isAnswered by remember { mutableStateOf(false) }
     var isCorrect by remember { mutableStateOf(false) }
 
-    val correctAnswer = question.answers.firstOrNull()?.trim()?.lowercase()
+    val correctAnswers = question.answers.map { it.trim().lowercase() }
     val submitColor = when {
         !isAnswered -> Color(0xFF007AFF)
         isCorrect -> Color(0xFF4CAF50)
@@ -93,9 +93,8 @@ fun WordScreen(
             onClick = {
                 if (isAnswered) return@Button
 
-                isCorrect = userAnswer.trim().lowercase() == correctAnswer
+                isCorrect = correctAnswers.contains(userAnswer.trim().lowercase())
                 isAnswered = true
-                onSubmit(isCorrect)
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = submitColor
@@ -119,8 +118,8 @@ fun WordScreen(
             onClick = {
                 userAnswer = ""
                 isAnswered = false
+                onSubmit(isCorrect)
                 isCorrect = false
-                onSubmit(false)
             },
             enabled = isAnswered,
             modifier = Modifier.fillMaxWidth()
