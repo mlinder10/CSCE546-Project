@@ -47,6 +47,7 @@ fun FillBlankScreen(
 
     var selected by remember { mutableStateOf<List<Choice>>(emptyList()) }
     var submitted by remember { mutableStateOf(false) }
+    var isCorrect by remember { mutableStateOf(false) }
 
     val shuffledChoices = remember(question) {
         val incorrect = question.incorrectChoices.mapIndexed { i, t -> Choice(t, -i - 1) }
@@ -63,8 +64,8 @@ fun FillBlankScreen(
     fun handleSubmit() {
         if (selected.size != totalBlanks || submitted) return
         val correctCount = selected.countIndexed { i, c -> c.index == i }
+        isCorrect = correctCount == totalBlanks
         submitted = true
-        onSubmit(correctCount == totalBlanks)
     }
 
     fun handleClear() {
@@ -74,8 +75,9 @@ fun FillBlankScreen(
 
     fun handleNext() {
         selected = emptyList()
+        onSubmit(isCorrect)
+        isCorrect = false
         submitted = false
-        onSubmit(false) // Adjust based on your flow
     }
 
     Column(modifier = Modifier
