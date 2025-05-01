@@ -1,9 +1,6 @@
 package com.example.csce546_project.network
 
 import com.example.csce546_project.models.*
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapterFactory
 import com.google.gson.annotations.SerializedName
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -16,6 +13,7 @@ val IS_DEBUG = false
 // Store authentication token
 object TokenManager {
     var token: String? = null
+//    Hard coded token for testing: 625141b3-9b1c-4b4d-b934-acf0d39255de
 }
 
 data class AuthResponse(@SerializedName("token") val token: String)
