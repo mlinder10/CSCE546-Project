@@ -7,11 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -41,30 +42,29 @@ fun FillBlankScreen(
 ) {
     data class Choice(val text: String, val index: Int)
 
-    val textSplit = remember(question.text) { question.text.split(BLANK) }
+    val segments = remember(question.text) { question.text.split(BLANK) }
+    val totalBlanks = segments.size - 1
 
-    var selected by remember { mutableStateOf(listOf<Choice>()) }
+    var selected by remember { mutableStateOf<List<Choice>>(emptyList()) }
     var submitted by remember { mutableStateOf(false) }
-    var isCorrect by remember { mutableStateOf(false) }
 
     val shuffledChoices = remember(question) {
-        val incorrectChoices = question.incorrectChoices.mapIndexed { i, text -> Choice(text, -(i + 1)) }
-        val correctChoices = question.choices.mapIndexed { i, text -> Choice(text.text, i) }
-        (incorrectChoices + correctChoices).shuffled()
+        val incorrect = question.incorrectChoices.mapIndexed { i, t -> Choice(t, -i - 1) }
+        val correct = question.choices.mapIndexed { i, t -> Choice(t.text, i) }
+        (incorrect + correct).shuffled()
     }
 
-    val maxSelections = question.choices.size
-
     fun handleSelect(choice: Choice) {
-        if (selected.size >= maxSelections || submitted) return
-        selected = selected + choice
+        if (selected.size < totalBlanks && !submitted) {
+            selected = selected + choice
+        }
     }
 
     fun handleSubmit() {
-        if (selected.size != maxSelections || submitted) return
+        if (selected.size != totalBlanks || submitted) return
         val correctCount = selected.countIndexed { i, c -> c.index == i }
-        isCorrect = correctCount == maxSelections
         submitted = true
+        onSubmit(correctCount == totalBlanks)
     }
 
     fun handleClear() {
@@ -73,17 +73,15 @@ fun FillBlankScreen(
     }
 
     fun handleNext() {
-        onSubmit(isCorrect)
-        isCorrect = false
         selected = emptyList()
         submitted = false
+        onSubmit(false) // Adjust based on your flow
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
+
         // Title
         if (!question.title.isNullOrEmpty()) {
             Text(
@@ -93,34 +91,24 @@ fun FillBlankScreen(
             )
         }
 
-        // Prompt
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp)
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.Start
+        // Fill-in-the-blank prompt
+        FlowRow(
+            modifier = Modifier.padding(bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.Center
         ) {
-            textSplit.forEachIndexed { i, segment ->
-                Text(
-                    text = segment,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+            segments.forEachIndexed { i, segment ->
+                Text(text = segment, style = MaterialTheme.typography.bodyLarge)
 
-                if (i < maxSelections) {
+                if (i < totalBlanks) {
                     val choice = selected.getOrNull(i)
                     Box(
                         modifier = Modifier
-                            .padding(horizontal = 4.dp)
                             .background(
-                                color = if (submitted) {
-                                    when {
-                                        choice == null -> Color.LightGray
-                                        choice.index == i -> Color(0xFFC8E6C9) // green
-                                        else -> Color(0xFFFFCDD2) // red
-                                    }
-                                } else {
-                                    Color.LightGray
+                                when {
+                                    submitted && choice?.index == i -> Color(0xFFC8E6C9)
+                                    submitted && choice != null -> Color(0xFFFFCDD2)
+                                    else -> Color.LightGray
                                 },
                                 shape = MaterialTheme.shapes.small
                             )
@@ -134,11 +122,9 @@ fun FillBlankScreen(
 
         // Word bank
         FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
             shuffledChoices.forEach { choice ->
                 val alreadySelected = selected.contains(choice)
@@ -150,26 +136,28 @@ fun FillBlankScreen(
                         containerColor = if (alreadySelected) Color.Gray else MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text(text = choice.text)
+                    Text(choice.text)
                 }
             }
         }
 
-        // Buttons
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Action buttons
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedButton(
                 onClick = { handleClear() },
-                enabled = !submitted && selected.isNotEmpty()
+                enabled = selected.isNotEmpty() && !submitted
             ) {
                 Text("Clear")
             }
 
             Button(
                 onClick = { handleSubmit() },
-                enabled = !submitted && selected.size == maxSelections
+                enabled = selected.size == totalBlanks && !submitted
             ) {
                 Text("Submit")
             }
@@ -177,17 +165,13 @@ fun FillBlankScreen(
             Button(
                 onClick = { handleNext() },
                 enabled = submitted,
-                shape = CircleShape,
-                modifier = Modifier.size(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (submitted) Color(0xFF007AFF) else Color.Gray
-                )
             ) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Next", tint = Color.White)
+                Text("Next")
             }
         }
     }
 }
+
 
 inline fun <T> List<T>.countIndexed(predicate: (index: Int, item: T) -> Boolean): Int {
     var count = 0
