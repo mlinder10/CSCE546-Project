@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 
 // Hardcoded credentials
 // Change these to get sections from a different account
-private const val EMAIL = "jake@email.com"
+private const val EMAIL = "jp1@email.com"
 private const val PASSWORD = "pass"
 
 @OptIn(ExperimentalMaterial3Api::class)
